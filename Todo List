@@ -1,0 +1,455 @@
+//Dominic Perotti
+//CPSC 230
+//Final Exam (Task 1)
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <map>
+using namespace std;
+
+string getLineNum(int, string, vector<string>);
+void writeFile(vector<string>);
+void check(string);
+void outputer(vector<string>, int);
+
+void writeFile(vector<string> vec)
+{
+	//Write Contents Back to File
+		ofstream wFile;
+		vector<string> finalVec;
+		wFile.open("todo.txt");
+		
+		//Find A Priority
+		for(unsigned int i = 0; i < vec.size(); i++)
+		{
+			if(vec[i].find("<A>") < vec.size())
+			{
+				finalVec.push_back(vec[i]);
+				vec.erase(vec.begin()+i);
+				
+			}
+		}
+		
+		//Find B Priority
+		for(unsigned int i = 0; i < vec.size(); i++)
+		{
+			if(vec[i].find("<B>")< vec.size())
+			{
+				finalVec.push_back(vec[i]);
+				vec.erase(vec.begin()+i);
+				
+			}
+		}
+		
+		//Find C Priority
+		for(unsigned int i = 0; i < vec.size(); i++)
+		{
+			if(vec[i].find("<C>")< vec.size())
+			{
+				finalVec.push_back(vec[i]);
+				vec.erase(vec.begin()+i);
+				
+			}
+		}
+		
+		//Push Remaining into Vector
+		for(unsigned int i = 0; i < vec.size(); i++)
+		{
+			finalVec.push_back(vec[i]);
+		}
+		
+		//Write Vector to File
+		for(unsigned int i = 0; i < finalVec.size(); i++)
+		{
+			wFile <<finalVec[i]<<endl;
+		}
+	
+	
+		wFile.close();
+}
+
+
+
+//Function to Determine Line Number when Number is attached to another task
+string getLineNum(int lineNum, string sNum, vector<string> vec)
+{
+	for(unsigned int u = 0; u < vec.size(); u++)
+	{
+		if(vec[u].find(sNum) < vec.size()+1)
+		{
+			lineNum++;
+			ostringstream convert;
+			convert << lineNum;
+			sNum = convert.str();
+			sNum = getLineNum(lineNum, sNum, vec);
+		}
+	}
+	
+	return sNum;
+}
+
+//Outputs Message when Adding Contexts and Projects
+void check(string line)
+{
+	istringstream ss(line);
+	do
+	{
+		string temp;
+		ss >> temp;
+		if(temp.find("+") < temp.length())
+			cout<<"Added to project "<<temp<<endl;
+		if(temp.find("@") < temp.length())
+		{
+			cout<<"Added to context "<<temp<<endl;
+		}
+	}while(ss);
+}
+
+//Function to Output specific Contents and Prioritized Tasks
+void outputer(vector<string> vec, int selec)
+{
+	if(selec == 1)
+	{
+		for(unsigned int t = 0; t < vec.size(); t++)
+				{
+					//Red Text
+					if(vec[t].find("<A>") < vec[t].length())
+					{
+						//cout<<"\e[033;31m";
+						
+						cout<<"\e[033;31m(\e[033;39m"<<"\e[033;31m" << t+1 <<"\e[033;39m" <<"\e[033;31m) \e[033;39m"<<"\e[033;31m"<<vec[t]<<"\e[033;39m"<<endl;
+						
+						//cout<<"\e[033;39m";
+					}
+					
+					//Green Text
+					else if(vec[t].find("<B>") < vec[t].length())
+					{
+						//cout<<"\e[033;32m";
+						
+						cout<<"\e[033;32m(\e[033;39m"<<"\e[033;32m" << t+1 <<"\e[033;39m" <<"\e[033;32m) \e[033;39m"<<"\e[033;32m"<<vec[t]<<"\e[033;39m"<<endl;
+						
+						//cout<<"\e[033;39m";
+					}
+					
+					//Blue Text
+					else if(vec[t].find("<C>") < vec[t].length())
+					{
+						//cout<<"\e[033;34m";
+						
+						cout<<"\e[033;34m(\e[033;39m"<<"\e[033;34m" << t+1 <<"\e[033;39m" <<"\e[033;34m) \e[033;39m"<<"\e[033;34m"<<vec[t]<<"\e[033;39m"<<endl;
+						
+						//cout<<"\e[033;39m";
+					}
+					else
+						cout<<"("<<t+1<<") "<<vec[t]<<endl;
+				}
+	}
+	else if(selec == 2)
+	{
+		for(unsigned int t = 0; t < vec.size(); t++)
+				{
+					//Red Text
+					if(vec[t].find("<A>") < vec[t].length())
+					{
+						//cout<<"\e[033;31m";
+						
+						cout<<"\e[033;31m"<<vec[t]<<"\e[033;39m"<<endl;
+						
+						//cout<<"\e[033;39m";
+					}
+					
+					//Green Text
+					else if(vec[t].find("<B>") < vec[t].length())
+					{
+						//cout<<"\e[033;32m";
+						
+						cout<<"\e[033;32m"<<vec[t]<<"\e[033;39m"<<endl;
+						
+						//cout<<"\e[033;39m";
+					}
+					
+					//Blue Text
+					else if(vec[t].find("<C>") < vec[t].length())
+					{
+						//cout<<"\e[033;34m";
+						
+						cout<<"\e[033;34m"<<vec[t]<<"\e[033;39m"<<endl;
+						
+						//cout<<"\e[033;39m";
+					}
+					else
+						cout<<vec[t]<<endl;
+				}	
+	}
+}
+
+//Main
+int main(int argc, char **argv)
+{
+
+	//Open or Todo File
+	ifstream myfile;
+	myfile.open("todo.txt");
+
+	//Set Up Variables
+	string input1 = argv[1];
+	string input2;
+	vector<string> iVec;
+	if(argv[2] != NULL)
+	{
+		for(unsigned int k = 2; k < argc; k++)
+		{ 
+			input2 = argv[k];
+			iVec.push_back(input2);
+		}
+	}
+	
+	//Error Checking
+	if(!(input1 == "do" || input1 == "ls" || input1 == "list" || input1 == "add" || input1 == "a" || input1 == "pri" || input1 == "lsp"
+	|| input1 == "depri"))
+	{
+		input1 = "invalid";
+		cout<<"TODO: Command Invalid"<<endl;
+	}
+	
+	//Get File Contents
+	vector<string> vec;
+	string line;
+	while(getline(myfile, line))
+	{
+		vec.push_back(line);
+	}
+	
+	myfile.close();
+	
+	
+	/* 
+		****************
+		**ADD FUNCTION**
+		****************
+	*/
+	
+	//If they type "add" or "a"
+	if(input1 == "add" || input1 == "a")
+	{
+		int lineNum = vec.size();
+		lineNum++;
+		string result;
+		ostringstream convert;
+		convert << lineNum;
+		result = getLineNum(lineNum, convert.str(), vec);
+		string sln = result;
+		
+		result = input2;
+		vec.push_back(result);
+		
+		//Output
+		cout<<"TODO: Added '"<<input2<<"' on line "<<sln<<"."<<endl;
+		
+		//Check if contains projects or contexts
+		check(input2);
+		
+		
+		//Write Contents Back to File
+		writeFile(vec);
+	}
+	
+	
+	
+	/*
+		***************
+		**DO FUNCTION**
+		***************
+	*/
+	
+	//If they type "do"
+	if(input1 == "do")
+	{
+		string taskNum = iVec[0];
+		
+		//Cycle through Vector with File Contents
+		for(unsigned int i = 0; i < vec.size(); i++)
+		{
+			string checkNum = to_string(i+1);
+			if(checkNum == input2)
+			{
+				
+				cout<<"TODO: '"<<vec[i]<<"' marked as done."<<endl;
+				vec.erase(vec.begin()+i);
+			}
+		}
+		
+		
+		//Write Contents Back to FIle
+		writeFile(vec);
+	}
+	
+	
+	/*
+		*****************
+		**LIST FUNCTION**
+		*****************
+	*/
+	
+	//If they type "ls" or "list"
+	if(input1 == "ls" || input1 == "list")
+	{
+		if(argv[2] == NULL)
+		{
+			int sn = 1;
+			outputer(vec, sn);
+			cout<<endl<<"--"<<endl;
+			cout<<"TODO: "<< vec.size() <<" tasks in file."<<endl;
+		}
+				
+		else if(iVec.size() > 0)
+		{
+			map<string, int> counter;
+			for(unsigned int t = 0; t < vec.size(); t++)
+			{
+				for(unsigned int k = 0; k < iVec.size(); k++)
+				{
+					if(vec[t].find(iVec[k]) < vec[t].length()+1 && vec[t].find(iVec[k]) < vec[t].find(")"))
+					{
+						string result;
+						ostringstream convert;
+						convert << t+1;
+						result = "(" + convert.str() + ") " + vec[t];
+						counter[result]++;
+					}
+				}
+			}
+			for(map<string, int>::iterator it = counter.begin(); it != counter.end(); it++)
+			{
+				
+				if(it->second == iVec.size())
+				{
+					vector<string> newVec;
+					newVec.push_back(it->first);
+					int sn = 2;
+					outputer(newVec, sn);
+				}
+			}
+			cout<<endl<<"--"<<endl;
+			cout<<"TODO: "<< vec.size() <<" tasks in file."<<endl;
+			
+		}
+	}
+	
+	
+	/*
+		****************
+		**Pri FUNCTION**
+		****************
+	*/
+	
+	if(input1 == "pri")
+	{
+		int lineNum;
+		stringstream convert(iVec[0]);
+		
+		if(!(convert >>lineNum))
+		{
+			lineNum = 0;
+		}
+		
+		
+		if(iVec.size() > 1)
+		{
+			string pLetter = iVec[1];
+			for(unsigned int i = 0; i < vec.size(); i++)
+			{
+				if(i+1 == lineNum)
+				{
+					if(vec[i].find("<") == 0)
+					{
+						cout<<"TODO: Task already prioritized."<<endl; 
+					}
+					else
+					{
+						cout<<"TODO: Prioritized '"<< vec[i]<<".'"<<endl;
+						string temp = "<" + pLetter + "> " + vec[i];
+						vec.erase(vec.begin()+i);
+						
+						vec.push_back(temp);
+						
+						//Write Back to File
+						writeFile(vec);
+					}
+				}
+			}
+		}
+		
+		else
+			cout<<"TODO: Invalid Input."<<endl;
+		
+	}
+	
+	/*
+		****************
+		**LSP FUNCTION**
+		****************
+	*/
+	
+	if(input1 == "lsp")
+	{
+		for(unsigned int i = 0; i < vec.size(); i++)
+		{
+			if(vec[i].find("<") == 0)
+			{
+				vector<string> newVec;
+				string result;
+				ostringstream convert;
+				convert << i+1;
+				result = "(" + convert.str() + ") " + vec[i];
+				newVec.push_back(result);
+				outputer(newVec, 2);
+			}
+		}
+					
+	}	
+
+	/*
+		******************
+		**Depri FUNCTION**
+		******************
+	*/
+		
+	if(input1 == "depri")
+	{
+		int lineNum;
+		stringstream convert(iVec[0]);
+		if(!(convert >>lineNum))
+		{
+			lineNum = 0;
+		}
+		
+		if(iVec.size() == 1 && lineNum != 0)
+		{
+			for(unsigned int i = 0; i < vec.size(); i++)
+			{
+				if(i+1 == lineNum && vec[i].find("<") == 0)
+				{
+						vec[i].erase(vec[i].begin(), vec[i].begin()+4);
+						cout<<"TODO: Deprioritized '"<<vec[i]<<".'"<<endl;
+						//Write Contents Back to File
+						writeFile(vec);
+					
+				}
+			}
+		}
+		
+		else
+			cout<<"TODO: Invalid Input"<<endl;
+	
+	}
+	
+	
+	
+	
+}
+
+
