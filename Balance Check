@@ -1,0 +1,41 @@
+//Dominic Perotti
+#include <iostream>
+#include <string>
+#include<vector>
+using namespace std;
+
+
+int main(){
+	char ch;
+	vector<char> vec;
+	string opening = "{[(<";
+	string closing = "}])>";
+	int i = -1;
+	
+	while (cin >> ch)
+	{
+		if (opening.find(ch) != -1)
+		{
+			//cout<<"PUSHING: "<<ch<<endl;
+			vec.push_back(ch);
+			i++;
+		}
+		
+		
+		if(closing.find(ch) != -1)
+		{
+			//cout<<"vec["<<i<<"] is: "<<vec[i]<<endl;
+			if(vec[i] == opening[closing.find(ch)])	//closing figure matches opening figure
+			{	
+				//cout<<vec[i]<<" matches "<<opening[closing.find(ch)]<<endl;
+				vec.pop_back();
+				i--;
+			}
+		}
+	}
+	
+	if(vec.empty() != true)
+		cout<<"\n\nFile is unbalanced\n";
+	else if (vec.empty() == true)
+		cout << "\n\nFile is balanced\n";
+}
