@@ -1,0 +1,280 @@
+#include<iostream>
+#include<sstream>
+#include<fstream>
+#include<vector>
+#include<string>
+#include<map>
+
+using namespace std;
+
+void sort(vector<vector<bool>>, vector<string>, map<string, int>);
+void sortMax(vector<vector<bool>> matrix, vector<string> classList, map<string, int> classes);
+
+
+
+void sortMax(vector<vector<bool>> matrix, vector<string> classList, map<string, int> classes)
+{
+
+	vector<string> active;
+	vector<string> ordering;
+	for(unsigned int count1 = 0; count1 < classList.size(); count1++)
+	{
+		bool root;
+		for(unsigned int count2 = 0; count2 < classList.size(); count2++)
+		{
+			if(matrix[classes[classList[count1]]][count2] == false)
+				root = true;
+			else if(matrix[classes[classList[count1]]][count2] == true)
+			{
+				root = false;
+				break;
+			}
+		}
+		//cout<<"ROOT = "<<root<<endl;
+		if(root == true)
+		{
+			
+			active.push_back(classList[count1]);
+		}
+
+	}
+	int counter = 0;
+	int sCount = 1;
+	vector<string> next;
+	while(active.size() != 0)
+	{
+		ordering.push_back(active[counter]);
+		
+		//Remove Pushed Node's Edges
+		for(unsigned int rowCount = 0; rowCount < classList.size(); rowCount++)
+		{
+			int colCount = classes[active[counter]]; //colCount = 8
+			
+			//If node is an edge of active[counter]
+			if(matrix[rowCount][colCount] == true)
+			{
+				
+				
+				//Removes It as Edge
+				matrix[rowCount][colCount] = false;
+				
+				//Check if this Node has any Edges
+				bool Edges;
+				for(unsigned int count2 = 0; count2 < classList.size(); count2++)
+				{
+					if(matrix[rowCount][count2] == true)
+					{
+						Edges = true;
+						break;
+					}
+					else if(matrix[rowCount][count2] == false)
+						Edges = false;
+				}
+				if(Edges == false)
+				{
+					
+					next.push_back(classList[rowCount]);
+				
+				}
+				
+			}
+		}
+		active.pop_back();
+		counter++;
+		if(active.size() == 0 && next.size() != 0)
+		{
+			cout<<"Semester["<<sCount<<"]: ";
+			//Output Vector
+			for(unsigned int count = 0; count< ordering.size(); count++)
+			{
+				cout<<ordering[count]<<" ";
+			}
+			cout<<endl;
+			ordering.clear();
+			active.swap(next);
+			counter = 0;
+			sCount++;
+			
+		}
+	}
+
+	cout<<"Semester["<<sCount++<<"]: ";
+	//Output Vector
+	for(unsigned int count = 0; count< ordering.size(); count++)
+	{
+		cout<<ordering[count]<<" ";
+	}
+	cout<<endl;
+}
+
+
+//Sort Function
+void sort(vector<vector<bool>> matrix, vector<string> classList, map<string, int> classes)
+{
+
+	vector<string> active;
+	vector<string> ordering;
+	for(unsigned int count1 = 0; count1 < classList.size(); count1++)
+	{
+		bool root;
+		for(unsigned int count2 = 0; count2 < classList.size(); count2++)
+		{
+			if(matrix[classes[classList[count1]]][count2] == false)
+				root = true;
+			else if(matrix[classes[classList[count1]]][count2] == true)
+			{
+				root = false;
+				break;
+			}
+		}
+		//cout<<"ROOT = "<<root<<endl;
+		if(root == true)
+		{
+			
+			active.push_back(classList[count1]);
+		}
+
+	}
+	int counter = 0;
+	vector<string> next;
+	while(active.size() != 0)
+	{
+		ordering.push_back(active[counter]);
+		
+		
+		//Remove Pushed Node's Edges
+		for(unsigned int rowCount = 0; rowCount < classList.size(); rowCount++)
+		{
+			int colCount = classes[active[counter]];
+			
+			//If node is an edge of active[counter]
+			if(matrix[rowCount][colCount] == true)
+			{
+				
+				//Removes It as Edge
+				matrix[rowCount][colCount] = false;
+				
+				//Check if this Node has any Edges
+				bool Edges;
+				for(unsigned int count2 = 0; count2 < classList.size(); count2++)
+				{
+					if(matrix[rowCount][count2] == true)
+					{
+						Edges = true;
+						break;
+					}
+					else if(matrix[rowCount][count2] == false)
+						Edges = false;
+				}
+				if(Edges == false)
+				{
+					
+					next.push_back(classList[rowCount]);
+				
+				}
+				
+			}
+		}
+		active.pop_back();
+		counter++;
+		if(active.size() == 0 && next.size() != 0)
+		{
+			active.swap(next);
+			counter = 0;
+			
+		}
+	}
+	
+	//Output Vector
+	for(unsigned int count = 0; count< ordering.size(); count++)
+	{
+		cout<<"Semester["<<count+1<<"]: "<<ordering[count]<<endl;
+	}
+	
+}
+
+int main(int argc, char **argv) 
+{
+	string classesPerSemester = argv[1];
+	int cps;
+	stringstream(classesPerSemester) >> cps;
+	string line;
+	string baseClass;
+	vector<string> classList;
+	map<string, int> classes;
+	int numPrereq;
+	string preReq;
+	int count = 0;
+	
+	ifstream input(argv[2]); //filename
+	while (getline(input, line))
+	{
+		stringstream lineStream;
+		lineStream << line;
+		lineStream >> baseClass;
+		classes[baseClass] = count++;
+		classList.push_back(baseClass);
+		//cout<<"Line: "<<line<<endl;
+		//cout<<"BaseClass: "<<baseClass<<endl;
+		
+	}
+	
+	//Print Maps
+	map<int, string> classesNum;
+	
+	int numCols = count;
+	int numRows = count;
+	
+	vector<vector<bool>> matrix;
+	matrix.resize(numCols, vector<bool> (numRows, false)); //initializes it to be full of falses
+	
+	// go back to beginning of file
+	input.clear( );              // reset end of file to false
+	input.seekg(0, ios::beg);
+	
+	while(getline(input, line))
+	{
+		stringstream lineStream;
+		lineStream << line;
+		lineStream >> baseClass;
+		int sourceInt = classes[baseClass];
+		matrix[sourceInt][sourceInt] = false;
+		//cout<<"Line: "<<line<<endl;
+		//cout<<"BaseClass: "<<baseClass<<endl;
+		while(lineStream >> numPrereq)
+		{
+			for(int counter = 0; counter < numPrereq; counter++)
+			{
+				lineStream>>preReq;
+				//cout<<"Prereq = "<<preReq<<endl;
+				matrix[sourceInt][classes[preReq]] = true;
+			}
+		}
+	}
+		/*//Output Graph
+		for(int count1 = 0; count1 < numCols; count1++)
+		{
+			cout<<"["<<count1<<"]     ";
+			for(int count2 = 0; count2 < numRows; count2++)
+			{
+				if(matrix[count1][count2] == false)
+				{
+					cout<<"0 ";
+				}
+				else if(matrix[count1][count2] == true)
+				{
+				cout<<"1 ";
+				}
+			}
+			cout<<endl;
+		}
+		*/
+	if(cps == 1)
+		sort(matrix, classList, classes);
+	else if(cps == -1)
+		sortMax(matrix, classList, classes);
+	else if(cps > 1)
+		sort(matrix, classList, classes); //Didn't get this far
+		
+	return 0;
+}
